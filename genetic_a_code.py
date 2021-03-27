@@ -123,92 +123,120 @@ def rouletteWheel(population, popuNum): #usamos la roulette wheel en la poblacio
 
 def crossover(population, roulette):
     newPopulation = []
-    hijo = Person()
 
+    while True:
+        lol = len(roulette)
+        if lol == 0:
+            break
+        hijo = Person()
+        #print("ruleta inicial")
+        #print(roulette)
+        person1 = secrets.choice(roulette)
+        #print("persona 1")
+        #print(person1)
+        #ahora hacemos un ciclo while para quitar a la persona 1 de la ruleta, lo hacemos en un ciclo ya que puede aparecer varias veces
+        posicion = 0
+        while posicion < len(roulette):
+            if roulette[posicion] == person1:
+                roulette.pop(posicion)
+            else:
+                posicion = posicion + 1
+        #print("ruleta quitando persona 1")
+        #print(roulette)
 
-    #print("ruleta inicial")
-    #print(roulette)
-    person1 = secrets.choice(roulette)
-    #print("persona 1")
-    #print(person1)
-    #ahora hacemos un ciclo while para quitar a la persona 1 de la ruleta, lo hacemos en un ciclo ya que puede aparecer varias veces
-    posicion = 0
-    while posicion < len(roulette):
-        if roulette[posicion] == person1:
-            roulette.pop(posicion)
-        else:
-            posicion = posicion + 1
-    #print("ruleta quitando persona 1")
-    #print(roulette)
+        #ahora si podemos encontrar a la persona 2 con quien aparearse
+        person2 = secrets.choice(roulette)
+        #print("persona 2")
+        #print(person2)
 
-    #ahora si podemos encontrar a la persona 2 con quien aparearse
-    person2 = secrets.choice(roulette)
-    #print("persona 2")
-    #print(person2)
+        #tambien eliminamos a la persona 2 de la ruleta
+        posicion = 0
+        while posicion < len(roulette):
+            if roulette[posicion] == person2:
+                roulette.pop(posicion)
+            else:
+                posicion = posicion + 1
+        #print("ruleta quitando persona 2")
+        #print(roulette)
 
-    #tambien eliminamos a la persona 2 de la ruleta
-    posicion = 0
-    while posicion < len(roulette):
-        if roulette[posicion] == person2:
-            roulette.pop(posicion)
-        else:
-            posicion = posicion + 1
-    #print("ruleta quitando persona 2")
-    #print(roulette)
+        """
+        print("mami 1")
+        print(population[person1].chromosome)
+        print("mami 2")
+        print(population[person2].chromosome)
+        """
 
-    """
-    print("mami 1")
-    print(population[person1].chromosome)
-    print("mami 2")
-    print(population[person2].chromosome)
-    """
+        #HIJO 1
+        aux0 = 0  # auxiliar del ciclo while 1
+        aux1 = 4  # auxiliar del ciclo while 2
+        while aux0 < 4:
+            hijo.chromosome[aux0] = population[person1].chromosome[aux0]
+            aux0 += 1
+        while aux1 < 8:
+            hijo.chromosome[aux1] = population[person2].chromosome[aux1]
+            aux1 += 1
+        #print("hijo1 antes de append")
+        #print(hijo.chromosome)
+        hijo.fitness = hijo.fitnessFunction()
+        newPopulation.append(hijo)
 
-    #HIJO 1
-    aux0 = 0  # auxiliar del ciclo while 1
-    aux1 = 4  # auxiliar del ciclo while 2
-    while aux0 < 4:
-        hijo.chromosome[aux0] = population[person1].chromosome[aux0]
-        aux0 += 1
-    while aux1 < 8:
-        hijo.chromosome[aux1] = population[person2].chromosome[aux1]
-        aux1 += 1
-    #print("hijo1 antes de append")
-    #print(hijo.chromosome)
-    hijo.fitness = hijo.fitnessFunction()
-    newPopulation.append(hijo)
-
-    #HIJO 2
-    aux2 = 4
-    aux3 = 0
-    while aux2 < 8:
-        hijo.chromosome[aux2] = population[person1].chromosome[aux2]
-        aux2 += 1
-    while aux3 < 4:
-        hijo.chromosome[aux3] = population[person2].chromosome[aux3]
-        aux3 += 1
-    #print("hijo2 antes de append")
-    #print(hijo.chromosome)
-    hijo.fitness = hijo.fitnessFunction()
-    newPopulation.append(hijo)
+        #HIJO 2
+        aux2 = 4
+        aux3 = 0
+        while aux2 < 8:
+            hijo.chromosome[aux2] = population[person1].chromosome[aux2]
+            aux2 += 1
+        while aux3 < 4:
+            hijo.chromosome[aux3] = population[person2].chromosome[aux3]
+            aux3 += 1
+        #print("hijo2 antes de append")
+        #print(hijo.chromosome)
+        hijo.fitness = hijo.fitnessFunction()
+        newPopulation.append(hijo)
     return newPopulation
 
 
+def buscarPerfecto(population, popuNum):
+    perfecto = np.ones((5,), dtype=int)
+    encontrado = False
+    unu = 0
+    while unu < popuNum:
+        if population[unu].chromosome == perfecto:
+            encontrado = True
+            break
+        unu += 1
+    return encontrado
+
+def mutation(population, popuNum):
+    x = random.randint(0,1)
+    y = random.randint(0,7)
+    unu = 0
+    while unu < popuNum:
+        population[unu].chromosome[y] = x
+        unu += 1
 
 
 def mainuwu():
     population = createPopulation(popuNum)
     print("orig")
     printPopu(population,popuNum)
+
+    #iteraciones = 0
+    #while True:
     eliminarInadaptados(population)
-    print("new")
-    printPopu(population,popuNum)
+    #print("new")
+    #printPopu(population,popuNum)
     r = rouletteWheel(population,popuNum)
     print("cross")
-    n = crossover(population, r)
-    printPopu(n,popuNum-2)
+    population = crossover(population, r)
+    printPopu(population,popuNum)
+    mutation(population, popuNum)
+        #iteraciones += 1
+        #if buscarPerfecto(population,popuNum) == True:
+           # print("he encontrado el perfecto")
+            #break
+
 
 mainuwu()
 
-#print(population[0].chromosome)
-#print(population[0].chromosome[0])
 
